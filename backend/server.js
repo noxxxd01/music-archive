@@ -17,6 +17,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("API is working");
+});
+
 app.use("/api/audio", audioRoutes);
 
 const PORT = process.env.PORT || 4000;
