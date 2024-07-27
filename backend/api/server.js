@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import connectDB from "./config/db.js";
-import audioRoutes from "./routes/audioRoutes.js";
+import connectDB from "../config/db.js";
+import audioRoutes from "../routes/audioRoutes.js";
 
 dotenv.config();
 const app = express();
