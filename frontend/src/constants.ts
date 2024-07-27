@@ -1,1 +1,1 @@
-export const API_URL = "http://localhost:4000/api/audio";
+export const API_URL = "https://music-archive-xedi.vercel.app/";
