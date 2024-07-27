@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import connectDB from "../config/db.js";
-import audioRoutes from "../routes/audioRoutes.js";
+import connectDB from "./config/db.js";
+import audioRoutes from "./routes/audioRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -14,7 +14,12 @@ connectDB();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://music-archive-seven.vercel.app/"],
+    methods: ["POST", "GET"],
+  })
+);
 
 // Routes
 app.get("/", (req, res) => {
