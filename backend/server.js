@@ -14,7 +14,11 @@ connectDB();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://music-archive-server-beryl.vercel.app/",
+  })
+);
 
 // Routes
 app.get("/", (req, res) => {
