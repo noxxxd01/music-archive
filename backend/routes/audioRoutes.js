@@ -2,14 +2,13 @@ import express from "express";
 import multer from "multer";
 import cloudinary from "../utils/cloudinary.js";
 import Track from "../models/trackSchema.js";
-import { promises as fs } from "fs";
-import path from "path";
 
 const router = express.Router();
 
-// Configure multer to check file types
+// Configure multer to use memory storage and check file types
+const storage = multer.memoryStorage();
 const upload = multer({
-  dest: "uploads/",
+  storage,
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "audio") {
       const ext = path.extname(file.originalname).toLowerCase();
@@ -39,28 +38,35 @@ router.post(
         return res.status(400).json({ error: "Title and artist are required" });
       }
 
-      // Additional check for MP3 file (in case the multer filter fails)
+      // Upload audio file to Cloudinary
       const audioFile = req.files["audio"][0];
-      if (path.extname(audioFile.originalname).toLowerCase() !== ".mp3") {
-        await fs.unlink(audioFile.path);
-        return res
-          .status(400)
-          .json({ error: "Audio file must be in MP3 format" });
-      }
+      const audioResult = await cloudinary.uploader
+        .upload_stream(
+          { resource_type: "auto", folder: "audio_uploads" },
+          (error, result) => {
+            if (error) {
+              throw error;
+            }
+            return result;
+          }
+        )
+        .end(audioFile.buffer);
 
-      const audioResult = await cloudinary.uploader.upload(audioFile.path, {
-        resource_type: "auto",
-        folder: "audio_uploads",
-      });
+      // Upload thumbnail file to Cloudinary
+      const thumbnailFile = req.files["thumbnail"][0];
+      const thumbnailResult = await cloudinary.uploader
+        .upload_stream(
+          { resource_type: "image", folder: "thumbnail_uploads" },
+          (error, result) => {
+            if (error) {
+              throw error;
+            }
+            return result;
+          }
+        )
+        .end(thumbnailFile.buffer);
 
-      const thumbnailResult = await cloudinary.uploader.upload(
-        req.files["thumbnail"][0].path,
-        {
-          resource_type: "image",
-          folder: "thumbnail_uploads",
-        }
-      );
-
+      // Create and save track in MongoDB
       const track = new Track({
         title: req.body.title,
         artist: req.body.artist,
@@ -70,19 +76,9 @@ router.post(
 
       await track.save();
 
-      // Clean up temporary files
-      await fs.unlink(audioFile.path);
-      await fs.unlink(req.files["thumbnail"][0].path);
-
       res.status(201).json({ message: "Track uploaded successfully", track });
     } catch (error) {
       console.error(error);
-      // Clean up any uploaded files in case of error
-      if (req.files["audio"])
-        await fs.unlink(req.files["audio"][0].path).catch(() => {});
-      if (req.files["thumbnail"])
-        await fs.unlink(req.files["thumbnail"][0].path).catch(() => {});
-
       res.status(500).json({ error: "An error occurred during upload" });
     }
   }
