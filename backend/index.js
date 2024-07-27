@@ -14,9 +14,7 @@ connectDB();
 // Middlewares
 app.use(
   cors({
-    origin: [
-      "https://music-archive-39ldy89t0-noirs-projects-550ebeb7.vercel.app/",
-    ],
+    origin: ["https://music-archive-seven.vercel.app"],
     methods: ["POST", "GET"],
     credentials: true,
   })
