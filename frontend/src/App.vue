@@ -22,7 +22,7 @@ const audioElement = ref<HTMLAudioElement | null>(null);
 
 const fetchTracks = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/audio/tracks`);
+    const response = await axios.get(`${API_URL}/tracks`);
     tracks.value = response.data;
     if (tracks.value.length > 0) {
       currentTrack.value = tracks.value[0];
