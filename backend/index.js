@@ -18,6 +18,7 @@ app.use(
   cors({
     origin: ["https://music-archive-seven.vercel.app/"],
     methods: ["POST", "GET"],
+    credentials: true,
   })
 );
 
