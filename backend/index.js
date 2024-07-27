@@ -12,8 +12,6 @@ const app = express();
 connectDB();
 
 // Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
@@ -23,6 +21,8 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.get("/", (req, res) => {
